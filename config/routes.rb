@@ -10,9 +10,19 @@ Rails.application.routes.draw do
   root "home#index"
   
   # Routes for piknik events
-  resources :events, only: [:new, :create, :show] do
+  resources :events, only: [:new, :create] do
     resources :dishes, except: [:index, :show]
   end
+  
+  # Admin route for event management
+  get "/events/:id/admin", to: "events#admin", as: :admin_event
+  
+  # Participant route with code in URL for better sharing
+  get "/events/:id/participate", to: "events#participate", as: :participate_event
+  get "/events/:code/join", to: "events#show", as: :show_event
+  
+  # Backward compatibility route
+  get "/events/:id", to: "events#show", as: :event
   
   # Routes for dish signups
   resources :dishes, only: [] do

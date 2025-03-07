@@ -1,0 +1,431 @@
+<div class="piknik-home-container">
+  <div class="event-details-container">
+    <% if notice.present? %>
+      <div class="notice-message">
+        <%= notice %>
+      </div>
+    <% end %>
+
+    <div class="event-header">
+      <h1><%= @event.name %> <span class="participant-badge">Participant View</span></h1>
+      <div class="event-code">
+        <span>Event Code:</span>
+        <strong><%= @event.code %></strong>
+        <button class="copy-button" onclick="copyEventCode()">Copy</button>
+      </div>
+    </div>
+
+    <div class="event-info-grid">
+      <div class="event-info-card">
+        <div class="icon">📅</div>
+        <div class="info">
+          <h3>Date & Time</h3>
+          <p><%= @event.date.strftime("%A, %B %d, %Y at %I:%M %p") %></p>
+        </div>
+      </div>
+
+      <div class="event-info-card">
+        <div class="icon">📍</div>
+        <div class="info">
+          <h3>Location</h3>
+          <p><%= @event.location %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="event-description">
+      <h2>About this Piknik</h2>
+      <p><%= @event.description.present? ? @event.description : "No additional details provided." %></p>
+      <% if @event.theme.present? %>
+        <div class="event-theme">
+          <h3>Theme: <%= @event.theme %></h3>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="event-actions">
+      <div class="share-piknik">
+        <h3>Share this Piknik</h3>
+        <p>Invite friends by sharing this event code: <strong><%= @event.code %></strong></p>
+        <button class="piknik-cta-button join" onclick="copyEventCode()">Copy Event Code</button>
+        <% if session[:created_event_ids].present? && session[:created_event_ids].include?(@event.id.to_s) %>
+          <%= link_to "Admin View", admin_event_path(@event), class: "piknik-cta-button admin" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Participant Section - For selecting dishes -->
+    <div class="participant-section">
+      <h2>Sign Up for a Dish</h2>
+      <p>Select a dish to bring to the potluck:</p>
+      
+      <% if @dishes.present? && @dishes.any? { |dish| dish.quantity_needed > (dish.quantity_signed_up || 0) } %>
+        <div class="available-dishes">
+          <h3>Available Dishes</h3>
+          <div class="dishes-list">
+            <% @dishes.each do |dish| %>
+              <% if dish.quantity_needed > (dish.quantity_signed_up || 0) %>
+                <div class="dish-card">
+                  <div class="dish-info">
+                    <h4><%= dish.name %></h4>
+                    <p><%= dish.description.present? ? dish.description : "No description provided" %></p>
+                    <div class="dish-quantities">
+                      <span>Available: <%= dish.quantity_needed - (dish.quantity_signed_up || 0) %> of <%= dish.quantity_needed %></span>
+                    </div>
+                  </div>
+                  <div class="dish-actions">
+                    <%= form_with(url: dish_signups_path(dish), scope: :signup, local: true, class: "signup-form") do |form| %>
+                      <div class="form-group signup-field">
+                        <%= form.label :participant_name, "Your Name:" %>
+                        <%= form.text_field :participant_name, required: true, class: "form-control" %>
+                      </div>
+                      <div class="form-group signup-field">
+                        <%= form.label :participant_email, "Your Email:" %>
+                        <%= form.email_field :participant_email, required: true, class: "form-control" %>
+                      </div>
+                      <div class="quantity-select">
+                        <%= form.label :quantity, "Quantity:" %>
+                        <%= form.select :quantity, 1..(dish.quantity_needed - (dish.quantity_signed_up || 0)), {}, { class: "form-control" } %>
+                      </div>
+                      <%= form.submit "Sign Up", class: "signup-btn" %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="no-dishes">
+          <p>There are no dishes available for sign-up at this time.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyEventCode() {
+    const code = "<%= @event.code %>";
+    navigator.clipboard.writeText(code).then(function() {
+      alert("Event code copied to clipboard!");
+    }, function() {
+      alert("Failed to copy event code");
+    });
+  }
+</script>
+
+<style>
+  .event-details-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .notice-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .event-header h1 {
+    margin: 0;
+    color: #333;
+    font-size: 2rem;
+  }
+  
+  .participant-badge {
+    font-size: 1rem;
+    background-color: #2196F3;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  .event-code {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-top: 10px;
+  }
+
+  .event-code span {
+    color: #666;
+    margin-right: 0.5rem;
+  }
+
+  .event-code strong {
+    color: #333;
+    letter-spacing: 1px;
+    margin-right: 0.75rem;
+  }
+
+  .copy-button {
+    border: none;
+    background: #4CAF50;
+    color: white;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .copy-button:hover {
+    background: #3d8b40;
+  }
+
+  .event-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .event-info-card {
+    display: flex;
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    align-items: center;
+  }
+
+  .event-info-card .icon {
+    font-size: 2.25rem;
+    margin-right: 1rem;
+  }
+
+  .event-info-card .info h3 {
+    margin: 0 0 0.5rem 0;
+    color: #555;
+    font-size: 1rem;
+  }
+
+  .event-info-card .info p {
+    margin: 0;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .event-description {
+    margin-bottom: 2rem;
+  }
+
+  .event-description h2 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  .event-description p {
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .event-theme {
+    margin-top: 1.5rem;
+    background: #f0f7ff;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #4285f4;
+  }
+
+  .event-theme h3 {
+    margin: 0;
+    color: #4285f4;
+    font-size: 1.1rem;
+  }
+
+  .event-actions {
+    margin-bottom: 2rem;
+  }
+
+  .share-piknik {
+    background: #f5f5f5;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .share-piknik h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: #333;
+  }
+
+  .share-piknik p {
+    margin-bottom: 1rem;
+    color: #555;
+  }
+
+  .piknik-cta-button {
+    display: inline-block;
+    padding: 0.6rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    border: none;
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+
+  .piknik-cta-button.join {
+    background: #4CAF50;
+    color: white;
+    border: none;
+  }
+
+  .piknik-cta-button.join:hover {
+    background: #3d8b40;
+  }
+  
+  .piknik-cta-button.admin {
+    background: #FF9800;
+    color: white;
+  }
+  
+  .piknik-cta-button.admin:hover {
+    background: #F57C00;
+  }
+
+  .participant-section {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .participant-section h2 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: #333;
+  }
+
+  .participant-section p {
+    color: #555;
+    margin-bottom: 1.5rem;
+  }
+
+  .dishes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .dish-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dish-info h4 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: #333;
+  }
+
+  .dish-info p {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .dish-quantities {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dish-quantities span {
+    background: #f5f5f5;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    color: #555;
+  }
+
+  .dish-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+  }
+
+  .signup-btn {
+    background: #4CAF50;
+    color: white;
+    border: 1px solid #3d8b40;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 0.75rem;
+  }
+
+  .signup-form {
+    margin-top: 1rem;
+  }
+
+  .signup-field {
+    margin-bottom: 0.75rem;
+  }
+
+  .quantity-select {
+    margin-bottom: 1rem;
+  }
+
+  .no-dishes {
+    background: #f8f9fa;
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    color: #6c757d;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out;
+  }
+
+  .form-control:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+</style>
