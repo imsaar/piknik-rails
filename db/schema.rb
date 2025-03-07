@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_03_07_164245) do
+ActiveRecord::Schema[7.0].define(version: 2025_03_07_181345) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "dishes", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.integer "quantity_needed"
+    t.integer "quantity_signed_up"
+    t.bigint "event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_dishes_on_event_id"
+  end
 
   create_table "events", force: :cascade do |t|
     t.string "name"
@@ -22,6 +33,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_07_164245) do
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "theme"
   end
 
   create_table "participant_signups", force: :cascade do |t|
@@ -75,7 +87,20 @@ ActiveRecord::Schema[7.0].define(version: 2025_03_07_164245) do
     t.index ["potluck_item_id"], name: "index_potluck_signups_on_potluck_item_id"
   end
 
+  create_table "signups", force: :cascade do |t|
+    t.bigint "dish_id", null: false
+    t.string "participant_name"
+    t.string "participant_email"
+    t.integer "quantity"
+    t.boolean "confirmed"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dish_id"], name: "index_signups_on_dish_id"
+  end
+
+  add_foreign_key "dishes", "events"
   add_foreign_key "participant_signups", "potluck_items"
   add_foreign_key "potluck_items", "potluck_events"
   add_foreign_key "potluck_signups", "potluck_items"
+  add_foreign_key "signups", "dishes"
 end

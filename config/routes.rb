@@ -1,11 +1,23 @@
 Rails.application.routes.draw do
+  get 'signups/create'
+  get 'dishes/create'
+  get 'dishes/edit'
+  get 'dishes/update'
+  get 'dishes/destroy'
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
   root "home#index"
   
   # Routes for piknik events
-  resources :events, only: [:new, :create, :show]
+  resources :events, only: [:new, :create, :show] do
+    resources :dishes, except: [:index, :show]
+  end
+  
+  # Routes for dish signups
+  resources :dishes, only: [] do
+    resources :signups, only: [:new, :create]
+  end
   get "/join", to: "events#join", as: :join_event
   post "/attend", to: "events#attend", as: :attend_event
   

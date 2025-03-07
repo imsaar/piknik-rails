@@ -1,4 +1,7 @@
 class Event < ApplicationRecord
+  # Associations
+  has_many :dishes, dependent: :destroy
+  
   # Validations
   validates :name, presence: true
   validates :date, presence: true
