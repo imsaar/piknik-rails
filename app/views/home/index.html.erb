@@ -1,0 +1,46 @@
+<div class="piknik-home-container">
+  <div class="piknik-hero">
+    <h1>Welcome to Piknik</h1>
+    <p class="tagline">Plan and share outdoor gatherings with friends and family</p>
+  </div>
+
+  <div class="piknik-cta-container">
+    <div class="piknik-cta-card">
+      <h2>Create a New Piknik</h2>
+      <p>Start planning your perfect outdoor gathering. Invite friends, coordinate food, and pick the perfect spot.</p>
+      <%= link_to "Create Piknik", new_event_path, class: "piknik-cta-button create" %>
+    </div>
+
+    <div class="piknik-cta-card">
+      <h2>Join a Piknik</h2>
+      <p>Got an invite? Enter the event code to join and see all the details for an upcoming piknik.</p>
+      <%= link_to "Join Existing Piknik", join_event_path, class: "piknik-cta-button join" %>
+    </div>
+  </div>
+
+  <div class="piknik-features">
+    <h2>Why use Piknik?</h2>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">📅</div>
+        <h3>Easy Planning</h3>
+        <p>Coordinate dates, locations, and participants all in one place</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🍉</div>
+        <h3>Food Coordination</h3>
+        <p>Track who's bringing what to avoid duplicates</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📍</div>
+        <h3>Location Sharing</h3>
+        <p>Share the exact meeting spot with maps integration</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔔</div>
+        <h3>Reminders</h3>
+        <p>Send automatic notifications to all participants</p>
+      </div>
+    </div>
+  </div>
+</div>

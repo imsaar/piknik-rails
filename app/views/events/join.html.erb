@@ -1,0 +1,136 @@
+<div class="piknik-home-container">
+  <div class="piknik-form-container">
+    <h1>Join a Piknik</h1>
+    <p>Enter the event code to join an existing Piknik gathering</p>
+
+    <% if flash[:alert].present? %>
+      <div class="error-messages">
+        <p><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <%= form_with(url: attend_event_path, method: :post, local: true, class: "piknik-form") do |form| %>
+      <div class="form-group event-code-input">
+        <%= form.label :code, "Event Code" %>
+        <%= form.text_field :code, class: "form-control code-field", placeholder: "Enter 6-character code", maxlength: 6 %>
+      </div>
+
+      <div class="form-actions">
+        <%= form.submit "Join Piknik", class: "piknik-cta-button join" %>
+        <%= link_to "Cancel", root_path, class: "cancel-link" %>
+      </div>
+    <% end %>
+
+    <div class="join-info">
+      <h3>Don't have a code?</h3>
+      <p>Ask the piknik organizer for the 6-character event code, or <%= link_to "create your own piknik event", new_event_path %> instead.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .piknik-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .piknik-form-container h1 {
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .piknik-form-container p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  .piknik-form .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .piknik-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .piknik-form .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  
+  .event-code-input .code-field {
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  
+  .error-messages {
+    color: #dc3545;
+    background-color: #f8d7da;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+  }
+  
+  .error-messages p {
+    margin: 0;
+    color: #dc3545;
+  }
+  
+  .form-actions {
+    display: flex;
+    align-items: center;
+    margin-top: 2rem;
+  }
+  
+  .cancel-link {
+    margin-left: 1rem;
+    color: #666;
+    text-decoration: none;
+  }
+  
+  .cancel-link:hover {
+    text-decoration: underline;
+  }
+  
+  input[type="submit"].piknik-cta-button {
+    border: none;
+    cursor: pointer;
+  }
+  
+  .join-info {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+  }
+  
+  .join-info h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  .join-info p {
+    margin-bottom: 0;
+  }
+  
+  .join-info a {
+    color: #6a11cb;
+    text-decoration: none;
+  }
+  
+  .join-info a:hover {
+    text-decoration: underline;
+  }
+</style>
